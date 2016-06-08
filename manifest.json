@@ -1,0 +1,30 @@
+{   "description": "Descarga videos y subtitulos",
+    "homepage_url": "http://danielarriola.com/",
+    "icons": {
+        "128": "icon128.png",
+        "16": "icon16.png",
+        "32": "icon32.png",
+        "48": "icon48.png"
+    },
+  "browser_action": {
+    "default_icon": {
+      "19": "icon16.png"
+    },
+    "default_title": "Full Downloader",
+    "default_popup": "popup.html"
+  },
+  "options_ui": {
+    "page": "options.html",
+    "chrome_style": true
+  },   
+   "manifest_version": 2,
+   "name": "Full Downloader",
+   "permissions": [ "tabs", "webRequest", "<all_urls>", "storage"],
+
+   "background": {
+    "scripts": ["index.js"],
+    "persistent": true
+  },
+  
+   "version": "1.15"
+}
