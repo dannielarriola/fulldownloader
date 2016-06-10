@@ -4,29 +4,27 @@ var get_query_variable = function(variable) {
     var vars = query.split("&");
     for (var i = 0; i < vars.length; i++) {
         var pair = vars[i].split("=");
-        if (pair[0] == variable) { return pair[1]; }
+        if (pair[0] == variable) {
+            return pair[1];
+        }
     }
     return (false);
 };
-
-var crear_enlace = function (url, type, tem) {
+var crear_enlace = function(url, type, tem) {
     var template = tem;
     template = template.replace(/{{TYPE}}/g, type).replace(/{{URL}}/g, url);
     return template;
 };
-
 var template = '<p><a class="{{TYPE}}" href="{{URL}}" alt="{{URL}}" title="{{URL}}" download>Click para descargar archivo {{TYPE}}</a></p>';
-
-
-$(document).ready(function () {
+$(document).ready(function() {
     var urlsvideos = get_query_variable("urlsvideo");
     var i;
     var url;
     if (urlsvideos) {
         urlsvideos = urlsvideos.split(',');
-        for (i in urlsvideos) {        
+        for (i in urlsvideos) {
             url = decodeURIComponent(urlsvideos[i]);
-            $('#contenido').append(crear_enlace(url, 'video', template));            
+            $('#contenido').append(crear_enlace(url, 'video', template));
         }
     }
     var urlssub = get_query_variable("urlssub");
@@ -37,7 +35,6 @@ $(document).ready(function () {
             $('#contenido').append(crear_enlace(url, 'sub', template));
         }
     }
-    
     var urlpersonalizado = get_query_variable("urlcustom");
     if (urlpersonalizado) {
         urlpersonalizado = urlpersonalizado.split(',');
@@ -46,11 +43,7 @@ $(document).ready(function () {
             $('#contenido').append(crear_enlace(url, 'custom', template));
         }
     }
-    
-
-
-
-    document.querySelector('#opciones').addEventListener('click', function () {
+    document.querySelector('#opciones').addEventListener('click', function() {
         if (chrome.runtime.openOptionsPage) {
             // New way to open options pages, if supported (Chrome 42+).
             chrome.runtime.openOptionsPage();
