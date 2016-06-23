@@ -1,4 +1,4 @@
-var FD = function() {
+var FD = function () {
     //Regular expresion
     FD.prototype.regExps = {
         expVideo: /\.mp4\?|\.mp4$|\.flv\?|\.flv$|googlevideo\.com\/videoplayback\?|googlevideo\.com\/videoplayback$|\.3gp\?|\.3gp$|\.mov\?|\.mov$|\.avi\?|\.avi$|\.wmv\?|\.wmv$|\.webm\?|\.webm$|www(.*)uptobox\.com\/stream|content\-na\.drive\.amazonaws\.com\/cdproxy\/templink/,
@@ -11,7 +11,7 @@ var FD = function() {
         urlCustom: {}
     };
     //get parameter querystring
-    FD.prototype.getQuerystringVariable = function(variable, query) {
+    FD.prototype.getQuerystringVariable = function (variable, query) {
         var vars = query.split("&");
         for (var i = 0; i < vars.length; i++) {
             var pair = vars[i].split("=");
@@ -22,7 +22,7 @@ var FD = function() {
         return (false);
     };
     //filter validate urls
-    FD.prototype.validarUrl = function(details, regexp, type) {
+    FD.prototype.validarUrl = function (details, regexp, type) {
         if (details.url.match(regexp)) {
             var u = details.url.split('?');
             if (u[0].match(regexp) && details.type != 'xmlhttprequest') {
@@ -32,7 +32,7 @@ var FD = function() {
         return false;
     };
     //create popup url
-    FD.prototype.createPopupUrl = function(tabid) {
+    FD.prototype.createPopupUrl = function (tabid) {
         var url = 'popup.html?init=1';
         if (FD.prototype.urls.urlVideos[tabid] !== undefined) {
             url += '&urlsvideo=' + FD.prototype.urls.urlVideos[tabid];
@@ -46,7 +46,7 @@ var FD = function() {
         return url;
     };
     //create badge
-    FD.prototype.createBadge = function(tabid) {
+    FD.prototype.createBadge = function (tabid) {
         var cantBadgeSub = 0;
         var cantBadgeVideos = 0;
         var cantBadgeCustom = 0;
@@ -71,8 +71,8 @@ var FD = function() {
         chrome.browserAction.setBadgeText(badge);
     };
     //web request listener
-    FD.prototype.addWebRequestListener = function() {
-        chrome.webRequest.onHeadersReceived.addListener(function(details) {
+    FD.prototype.addWebRequestListener = function () {
+        chrome.webRequest.onHeadersReceived.addListener(function (details) {
             var url = false;
             if (details.tabId > 0) {
                 var popup = {};
@@ -88,7 +88,7 @@ var FD = function() {
                         //add url to array
                         FD.prototype.urls.urlVideos[details.tabId].push(encodeURIComponent(url));
                     }
-                        console.log(FD.prototype.urls.urlVideos[details.tabId]);
+                    console.log(FD.prototype.urls.urlVideos[details.tabId]);
                     //object popup
                     popup = {};
                     popup.tabId = details.tabId;
@@ -118,7 +118,7 @@ var FD = function() {
                 //is custom
                 chrome.storage.sync.get({
                     codeRegExp: ''
-                }, function(items) {
+                }, function (items) {
                     if (items.codigo !== '') {
                         var customRegExp = new RegExp(items.codeRegExp, "i");
                         if (customRegExp !== undefined) {
@@ -149,9 +149,9 @@ var FD = function() {
         });
     };
     //add tab update listener
-    FD.prototype.addTabUpdatedListener = function() {
+    FD.prototype.addTabUpdatedListener = function () {
         //reset urls
-        chrome.tabs.onUpdated.addListener(function(tabid, changeinfo, tab) {
+        chrome.tabs.onUpdated.addListener(function (tabid, changeinfo, tab) {
             FD.prototype.urls.urlSub[tabid] = [];
             FD.prototype.urls.urlVideos[tabid] = [];
             FD.prototype.createBadge(tabid);
