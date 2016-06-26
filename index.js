@@ -119,7 +119,7 @@ var FD = function () {
                 chrome.storage.sync.get({
                     codeRegExp: ''
                 }, function (items) {
-                    if (items.codigo !== '') {
+                    if (items.codeRegExp !== '') {
                         var customRegExp = new RegExp(items.codeRegExp, "i");
                         if (customRegExp !== undefined) {
                             if (false !== FD.prototype.validarUrl(details, customRegExp, 'custom')) {
@@ -150,10 +150,7 @@ var FD = function () {
     };
     //add tab update listener
     FD.prototype.addTabUpdatedListener = function () {
-        //reset urls
         chrome.tabs.onUpdated.addListener(function (tabid, changeinfo, tab) {
-            FD.prototype.urls.urlSub[tabid] = [];
-            FD.prototype.urls.urlVideos[tabid] = [];
             FD.prototype.createBadge(tabid);
         });
     };
