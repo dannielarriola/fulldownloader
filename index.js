@@ -50,7 +50,7 @@ var FD = function () {
         var cantBadgeSub = 0;
         var cantBadgeVideos = 0;
         var cantBadgeCustom = 0;
-        var totalBadge = 0;
+
         var badge = {};
         if (FD.prototype.urls.urlVideos[tabid] !== undefined) {
             cantBadgeVideos += FD.prototype.urls.urlVideos[tabid].length;
@@ -61,7 +61,7 @@ var FD = function () {
         if (FD.prototype.urls.urlCustom[tabid] !== undefined) {
             cantBadgeCustom += FD.prototype.urls.urlCustom[tabid].length;
         }
-        totalBadge = cantBadgeSub + cantBadgeVideos + cantBadgeCustom;
+        var totalBadge = cantBadgeSub + cantBadgeVideos + cantBadgeCustom;
         if (totalBadge === 0) {
             badge.text = '';
         } else {
