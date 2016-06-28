@@ -10,19 +10,8 @@ var FD = function () {
         urlSub: {},
         urlCustom: {}
     };
-    //get parameter querystring
-    FD.prototype.getQuerystringVariable = function (variable, query) {
-        var vars = query.split("&");
-        for (var i = 0; i < vars.length; i++) {
-            var pair = vars[i].split("=");
-            if (pair[0] == variable) {
-                return pair[1];
-            }
-        }
-        return (false);
-    };
     //filter validate urls
-    FD.prototype.validarUrl = function (details, regexp, type) {
+    FD.validarUrl = function (details, regexp, type) {
         if (details.url.match(regexp)) {
             var u = details.url.split('?');
             if (u[0].match(regexp) && details.type != 'xmlhttprequest') {
@@ -46,7 +35,7 @@ var FD = function () {
         return url;
     };
     //create badge
-    FD.prototype.createBadge = function (tabid) {
+    FD.createBadge = function (tabid) {
         var cantBadgeSub = 0;
         var cantBadgeVideos = 0;
         var cantBadgeCustom = 0;
@@ -68,90 +57,99 @@ var FD = function () {
             badge.text = totalBadge.toString();
         }
         badge.tabId = tabid;
+        //noinspection JSUnresolvedVariable,JSUnresolvedFunction
         chrome.browserAction.setBadgeText(badge);
     };
     //web request listener
-    FD.prototype.addWebRequestListener = function () {
-        chrome.webRequest.onHeadersReceived.addListener(function (details) {
-            var url = false;
-            if (details.tabId > 0) {
-                var popup = {};
-                //is video
-                if (false !== FD.prototype.validarUrl(details, FD.prototype.regExps.expVideo, 'video')) {
-                    url = FD.prototype.validarUrl(details, FD.prototype.regExps.expVideo, 'video');
-                    if (!FD.prototype.urls.urlVideos.hasOwnProperty(details.tabId)) {
-                        //urls array
-                        FD.prototype.urls.urlVideos[details.tabId] = [];
-                    }
-                    //if dont exist
-                    if (FD.prototype.urls.urlVideos[details.tabId].indexOf(encodeURIComponent(url)) == -1) {
-                        //add url to array
-                        FD.prototype.urls.urlVideos[details.tabId].push(encodeURIComponent(url));
-                    }
-                    console.log(FD.prototype.urls.urlVideos[details.tabId]);
-                    //object popup
-                    popup = {};
-                    popup.tabId = details.tabId;
-                    popup.popup = FD.prototype.createPopupUrl(details.tabId);
-                    FD.prototype.createBadge(details.tabId);
-                    chrome.browserAction.setPopup(popup);
+    this.addWebRequestListener = function () {
+        //noinspection JSUnresolvedVariable,JSUnresolvedFunction
+        chrome.webRequest.onBeforeRedirect.addListener(this.getUrls, {urls: ["<all_urls>"]});
+        //noinspection JSUnresolvedVariable,JSUnresolvedFunction
+        chrome.webRequest.onCompleted.addListener(this.getUrls, {urls: ["<all_urls>"]});
+    };
+
+    this.getUrls = function (details) {
+        var url = false;
+        if (details.tabId > 0) {
+            var popup = {};
+            //is video
+            if (false !== FD.validarUrl(details, FD.prototype.regExps.expVideo, 'video')) {
+                console.log(details);
+                url = FD.validarUrl(details, FD.prototype.regExps.expVideo, 'video');
+                if (!FD.prototype.urls.urlVideos.hasOwnProperty(details.tabId)) {
+                    //urls array
+                    FD.prototype.urls.urlVideos[details.tabId] = [];
                 }
-                //is sub
-                if (false !== FD.prototype.validarUrl(details, FD.prototype.regExps.expSub, 'sub')) {
-                    url = FD.prototype.validarUrl(details, FD.prototype.regExps.expSub, 'sub');
-                    if (!FD.prototype.urls.urlSub.hasOwnProperty(details.tabId)) {
-                        //urls array
-                        FD.prototype.urls.urlSub[details.tabId] = [];
-                    }
-                    //if dont exist
-                    if (FD.prototype.urls.urlSub[details.tabId].indexOf(encodeURIComponent(url)) == -1) {
-                        //add url to array
-                        FD.prototype.urls.urlSub[details.tabId].push(encodeURIComponent(url));
-                    }
-                    //object popup
-                    popup = {};
-                    popup.tabId = details.tabId;
-                    popup.popup = FD.prototype.createPopupUrl(details.tabId);
-                    FD.prototype.createBadge(details.tabId);
-                    chrome.browserAction.setPopup(popup);
+                //if dont exist
+                if (FD.prototype.urls.urlVideos[details.tabId].indexOf(encodeURIComponent(url)) == -1) {
+                    //add url to array
+                    FD.prototype.urls.urlVideos[details.tabId].push(encodeURIComponent(url));
                 }
-                //is custom
-                chrome.storage.sync.get({
-                    codeRegExp: ''
-                }, function (items) {
-                    if (items.codeRegExp !== '') {
-                        var customRegExp = new RegExp(items.codeRegExp, "i");
-                        if (customRegExp !== undefined) {
-                            if (false !== FD.prototype.validarUrl(details, customRegExp, 'custom')) {
-                                url = FD.prototype.validarUrl(details, customRegExp, 'custom');
-                                if (!FD.prototype.urls.urlCustom.hasOwnProperty(details.tabId)) {
-                                    //urls array
-                                    FD.prototype.urls.urlCustom[details.tabId] = [];
-                                }
-                                //if dont exist
-                                if (FD.prototype.urls.urlCustom[details.tabId].indexOf(encodeURIComponent(url)) == -1) {
-                                    //add url to array
-                                    FD.prototype.urls.urlCustom[details.tabId].push(encodeURIComponent(url));
-                                }
-                                //object popup
-                                var popup = {};
-                                popup.tabId = details.tabId;
-                                popup.popup = FD.prototype.createPopupUrl(details.tabId);
-                                FD.prototype.createBadge(details.tabId);
-                                chrome.browserAction.setPopup(popup);
+                //object popup
+                popup = {};
+                popup.tabId = details.tabId;
+                popup.popup = FD.prototype.createPopupUrl(details.tabId);
+                FD.createBadge(details.tabId);
+                //noinspection JSUnresolvedVariable,JSUnresolvedFunction
+                chrome.browserAction.setPopup(popup);
+            }
+            //is sub
+            if (false !== FD.validarUrl(details, FD.prototype.regExps.expSub, 'sub')) {
+                url = FD.validarUrl(details, FD.prototype.regExps.expSub, 'sub');
+                if (!FD.prototype.urls.urlSub.hasOwnProperty(details.tabId)) {
+                    //urls array
+                    FD.prototype.urls.urlSub[details.tabId] = [];
+                }
+                //if dont exist
+                if (FD.prototype.urls.urlSub[details.tabId].indexOf(encodeURIComponent(url)) == -1) {
+                    //add url to array
+                    FD.prototype.urls.urlSub[details.tabId].push(encodeURIComponent(url));
+                }
+                //object popup
+                popup = {};
+                popup.tabId = details.tabId;
+                popup.popup = FD.prototype.createPopupUrl(details.tabId);
+                FD.createBadge(details.tabId);
+                //noinspection JSUnresolvedVariable,JSUnresolvedFunction
+                chrome.browserAction.setPopup(popup);
+            }
+            //is custom
+            //noinspection JSUnresolvedVariable,JSUnresolvedFunction
+            chrome.storage.sync.get({
+                codeRegExp: ''
+            }, function (items) {
+                if (items.codeRegExp !== '') {
+                    var customRegExp = new RegExp(items.codeRegExp, "i");
+                    if (customRegExp !== undefined) {
+                        if (false !== FD.validarUrl(details, customRegExp, 'custom')) {
+                            url = FD.validarUrl(details, customRegExp, 'custom');
+                            if (!FD.prototype.urls.urlCustom.hasOwnProperty(details.tabId)) {
+                                //urls array
+                                FD.prototype.urls.urlCustom[details.tabId] = [];
                             }
+                            //if dont exist
+                            if (FD.prototype.urls.urlCustom[details.tabId].indexOf(encodeURIComponent(url)) == -1) {
+                                //add url to array
+                                FD.prototype.urls.urlCustom[details.tabId].push(encodeURIComponent(url));
+                            }
+                            //object popup
+                            var popup = {};
+                            popup.tabId = details.tabId;
+                            popup.popup = FD.prototype.createPopupUrl(details.tabId);
+                            FD.createBadge(details.tabId);
+                            //noinspection JSUnresolvedVariable,JSUnresolvedFunction
+                            chrome.browserAction.setPopup(popup);
                         }
                     }
-                });
-            }
-        }, {
-            urls: ["<all_urls>"]
-        });
-    };
+                }
+            });
+        }
+    }
     //add tab update listener
     FD.prototype.addTabUpdatedListener = function () {
+        //noinspection JSUnresolvedVariable,JSUnresolvedFunction
         chrome.tabs.onUpdated.addListener(function (tabid, changeinfo, tab) {
-            FD.prototype.createBadge(tabid);
+            FD.createBadge(tabid);
         });
     };
 };
